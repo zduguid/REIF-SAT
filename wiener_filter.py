@@ -4,7 +4,7 @@
 # - Displays and saves the same image in the frequency domain
 #
 # Author: Zach Duguid
-# Last Updated: 11/2/2017
+# Last Updated: 11/14/2017
 
 import cv2
 import imutils
@@ -27,6 +27,7 @@ class FrameSet(object):
         self.f_img = np.fft.fft2(self.img)
         self.pup = cv2.imread(pup_f_name, 0)
         self.angles = np.linspace(0, 180, self.num_frames)
+        self.SNR = 10^5
 
         # initialize dictionary objects to keep track of information at different anlges of rotation
         self.pup_dict = {}
@@ -60,17 +61,14 @@ class FrameSet(object):
     def get_sythesized_image(self):
         ''' sythesizes image from individual frames via Wiener deconvolution  
         '''
-        # take the sum of the frames in the frequency domain
-        f_frame_sum = sum(self.f_frame_dict.values())
+        # get the average of the frames and MTF functions
+        self.avg_MTF = sum(self.MTF_dict.values())/self.num_frames
+        self.avg_frame = sum(self.frame_dict.values())/self.num_frames
 
-        # get the average of the MTF functions used to creat the frames
-        avg_MTF = sum(self.MTF_dict.values())/self.num_frames
-
-        # get the synthesized image in the frequency domain
-        self.f_final_img = f_frame_sum*avg_MTF
-
-        # get the synthesized image in the spatial domain
-        self.final_img = np.fft.ifft2(self.f_final_img)
+        # create and apply Wiener filter
+        self.wiener_filter = np.conjugate(self.avg_MTF) / (self.avg_MTF**2 + 1/(self.SNR^2))
+        self.f_filtered_img = np.fft.fft2(self.avg_frame) * self.wiener_filter
+        self.filtered_img = np.fft.ifft2(self.f_filtered_img)
 
 
     def get_circular_image(self):
@@ -90,7 +88,7 @@ class FrameSet(object):
         plt.figure(1, figsize=(12,6))
         plt.subplot(1,2,1), plt.imshow(abs(self.cir_img), cmap='gray')
         plt.title('Circular Aperture Image'), plt.xticks([]), plt.yticks([])
-        plt.subplot(1,2,2), plt.imshow(abs(self.final_img), cmap='gray')
+        plt.subplot(1,2,2), plt.imshow(abs(self.filtered_img), cmap='gray')
         plt.title('Synthesized Rectangular Aperture Image (' + str(self.num_frames) + ' Frames)'), plt.xticks([]), plt.yticks([])
         plt.show()
 

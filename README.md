@@ -4,7 +4,7 @@
 The goal of the Rectangular Earth-Imaging Fast-Spinning Aperture Telescope (REIF-SAT) project is to demonstrate the feasibility of a spinning-aperture space telescope that is capable of achieving high resolution images. REIF-SAT is the deliverable of MIT's Aerospace Engineering capstone course: 16.83 - Space Systems Engineering. In order to demonstrate the feasiblity of a spinning-aperture space telescope, we must develop image processing algorithms that can combine a series of frames into a final synthesized image. 
 
 
-### Our first approach is to implement a version of the Minimum Mean Square Error (MSE) on a single test image. To simulate the effect of the rectangular aperture, individual frames are generated from this single test image, and then the frames are synthesized using a simplified version of the MSE algorithm. The general process underlying this approach can be found below:
+### Our approach is to implement a Wiener Filtering algorithm on a single test image. To simulate the effect of the rectangular aperture, individual frames are generated from this single test image, and then the frames are synthesized using Wiener deconvolution. The general process underlying this approach can be found below:
 
 1. Frame Generation
     1. Take the two-dimensional Fast Fourier Transform (FFT) of of the pupil mask 
@@ -14,7 +14,7 @@ The goal of the Rectangular Earth-Imaging Fast-Spinning Aperture Telescope (REIF
     5. Rotate the pupil mask by some angle and repeat this process to produce the desired number of frames
 
 2. Image Synthesis
-    1. Perform a simplified version of the MSE algorithm by implementing Wiener-deconvolution: sum the individual frames in frequency domain, multiply this sum by the average MTF function, and then finally take the iFFT of the result to yield a single synthesized image in the spatial domain 
+    1. Create a Wiener filter using the average MTF and then perform Wiener-deconvolution: find the average of the frames in the spatial domain, convert this average to the frequency domain and multiply it pairwise by the custom Wiener filter, and then take the inverse Fourier Transform to yield the final synthesized image 
 
 
 ### Assumptions:
@@ -61,4 +61,5 @@ The goal of the Rectangular Earth-Imaging Fast-Spinning Aperture Telescope (REIF
     - [ ] Keypoint Matching method, that utilizes image features similar to the SIFT algorithm
 - [ ] Develop a plot that shows how accuracy of image processing varies depending on the number of frames used
 - [ ] Implement the image processing algorithms on the Raspberry Pi itself 
+- [ ] Demonstrate the ability to recover color images using the Wiener Filter approach
 
