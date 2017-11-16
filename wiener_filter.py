@@ -4,7 +4,7 @@
 # - Displays and saves the same image in the frequency domain
 #
 # Author: Zach Duguid
-# Last Updated: 11/14/2017
+# Last Updated: 11/16/2017
 
 import cv2
 import imutils
@@ -28,6 +28,7 @@ class FrameSet(object):
         self.pup = cv2.imread(pup_f_name, 0)
         self.angles = np.linspace(0, 180, self.num_frames)
         self.SNR = 10^5
+        self.pixel_max = 255.0
 
         # initialize dictionary objects to keep track of information at different anlges of rotation
         self.pup_dict = {}
@@ -61,9 +62,10 @@ class FrameSet(object):
     def get_sythesized_image(self):
         ''' sythesizes image from individual frames via Wiener deconvolution  
         '''
-        # get the average of the frames and MTF functions
+        # get the average of the frames and MTF functions (norm_avg_frame used for histogram plotting)
         self.avg_MTF = sum(self.MTF_dict.values())/self.num_frames
-        self.avg_frame = sum(self.frame_dict.values())/self.num_frames
+        self.avg_frame = sum(self.frame_dict.values())/len(self.frame_dict.values())
+        self.norm_avg_frame = self.avg_frame * (self.pixel_max/self.avg_frame.max())
 
         # create and apply Wiener filter
         self.wiener_filter = np.conjugate(self.avg_MTF) / (self.avg_MTF**2 + 1/(self.SNR^2))
@@ -79,11 +81,12 @@ class FrameSet(object):
         f_cir_pup_auto = abs(f_cir_pup*f_cir_pup_conj)
         cir_MTF = np.fft.ifft2(f_cir_pup_auto)
         f_cir_img = self.f_img*cir_MTF
-        self.cir_img = np.fft.ifft2(f_cir_img)     
+        self.cir_img = np.fft.ifft2(f_cir_img) 
+        self.norm_cir_img = self.cir_img * (self.pixel_max/self.cir_img.max())    
 
 
     def get_image_comparison(self):
-        ''' plot original test image vs. synthesized image
+        ''' plot circular aperture image vs. synthesized image
         '''
         plt.figure(1, figsize=(12,6))
         plt.subplot(1,2,1), plt.imshow(abs(self.cir_img), cmap='gray')
@@ -91,6 +94,29 @@ class FrameSet(object):
         plt.subplot(1,2,2), plt.imshow(abs(self.filtered_img), cmap='gray')
         plt.title('Synthesized Rectangular Aperture Image (' + str(self.num_frames) + ' Frames)'), plt.xticks([]), plt.yticks([])
         plt.show()
+
+
+    def get_histogram(self):
+        ''' calculate the histogram profile of the original image and the synthesized image, and then compare the two
+        '''
+        plt.figure(1, figsize=(15,6))
+        plt.subplot(1,3,1), plt.hist(abs(self.img).ravel(), 256, [0,256])
+        plt.title('Original Image'), plt.xticks([]), plt.yticks([])
+        plt.subplot(1,3,2), plt.hist(abs(self.filtered_img).ravel(), 256, [0,256])
+        plt.title('Filtered Image'), plt.xticks([]), plt.yticks([])
+        plt.subplot(1,3,3), plt.hist(abs(self.norm_avg_frame).ravel(), 256, [0,256])
+        plt.title('Blurry Image'), plt.xticks([]), plt.yticks([])
+        plt.show()
+
+
+    def get_image_angle(self):
+        ''' calculate the dot product between the histograms of the orginal image and synthesized image
+            - normalizes the dot product by the euclidian norm of each histogram
+            - prints cos(theta), where theta is the angle between the 
+        '''
+        A,bin1 = np.histogram(abs(self.img).ravel(),256,[0,256])
+        B,bin2 = np.histogram(abs(self.filtered_img).ravel(),256,[0,256])
+        print('cos(angle):', np.dot(A, B) / (np.linalg.norm(A)*np.linalg.norm(B)))
 
 
 if __name__ == '__main__':
@@ -104,4 +130,7 @@ if __name__ == '__main__':
     frame_set.get_sythesized_image()
     frame_set.get_circular_image()
     frame_set.get_image_comparison()
+    # frame_set.get_histogram()
+    frame_set.get_image_angle()
     
+
