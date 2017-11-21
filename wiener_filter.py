@@ -130,7 +130,7 @@ if __name__ == '__main__':
     frame_set.get_sythesized_image()
     frame_set.get_circular_image()
     frame_set.get_image_comparison()
-    # frame_set.get_histogram()
+    frame_set.get_histogram()
     frame_set.get_image_angle()
     
 
