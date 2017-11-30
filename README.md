@@ -1,5 +1,5 @@
 <a href="https://zduguid.github.io">
-    <img src="readme_images/project_logo.jpg" alt="project_logo" align="right" height="100">
+    <img src="readme_images/project_logo.jpg" alt="project_logo" align="right" height="80">
 </a>
 
 
