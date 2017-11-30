@@ -4,11 +4,11 @@
 # - Displays and saves the same image in the frequency domain
 #
 # Author: Zach Duguid
-# Last Updated: 11/16/2017
+# Last Updated: 11/30/2017
 
+import numpy as np
 import cv2
 import imutils
-import numpy as np
 import math
 from matplotlib import pyplot as plt
 
@@ -96,16 +96,16 @@ class FrameSet(object):
         plt.show()
 
 
-    def get_histogram(self):
+    def get_histograms(self):
         ''' calculate the histogram profile of the original image and the synthesized image, and then compare the two
         '''
-        plt.figure(1, figsize=(15,6))
+        plt.figure(2, figsize=(15,6))
         plt.subplot(1,3,1), plt.hist(abs(self.img).ravel(), 256, [0,256])
-        plt.title('Original Image'), plt.xticks([]), plt.yticks([])
+        plt.title('Original Image')#, plt.xticks([]), plt.yticks([])
         plt.subplot(1,3,2), plt.hist(abs(self.filtered_img).ravel(), 256, [0,256])
-        plt.title('Filtered Image'), plt.xticks([]), plt.yticks([])
+        plt.title('Filtered Image')#, plt.xticks([]), plt.yticks([])
         plt.subplot(1,3,3), plt.hist(abs(self.norm_avg_frame).ravel(), 256, [0,256])
-        plt.title('Blurry Image'), plt.xticks([]), plt.yticks([])
+        plt.title('Blurry Image')#, plt.xticks([]), plt.yticks([])
         plt.show()
 
 
@@ -116,7 +116,7 @@ class FrameSet(object):
         '''
         A,bin1 = np.histogram(abs(self.img).ravel(),256,[0,256])
         B,bin2 = np.histogram(abs(self.filtered_img).ravel(),256,[0,256])
-        print('cos(angle):', np.dot(A, B) / (np.linalg.norm(A)*np.linalg.norm(B)))
+        print('cos(histogram_angle):', np.dot(A, B) / (np.linalg.norm(A)*np.linalg.norm(B)))
 
 
 if __name__ == '__main__':
@@ -130,7 +130,7 @@ if __name__ == '__main__':
     frame_set.get_sythesized_image()
     frame_set.get_circular_image()
     frame_set.get_image_comparison()
-    frame_set.get_histogram()
+    frame_set.get_histograms()
     frame_set.get_image_angle()
     
 
