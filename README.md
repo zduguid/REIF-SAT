@@ -14,7 +14,7 @@ The goal of the Rectangular Earth-Imaging Fast-Spinning Aperture Telescope (REIF
     - [Frame Generation](#frame-generation)
     - [Wiener Filter](#wiener-filter)
     - [Synthesis Accuracy](#synthesis-accuracy)
-    - [Helpful OpenCV and NumPy Commands](#helpful-commands)
+    - [Helpful OpenCV and NumPy Commands](#helpful-opencv-and-numpy-commands)
 - [Future Work](#future-work)
 - [Acknowledgements](#acknowledgements)
 
@@ -55,7 +55,7 @@ To determine the synthesis accuracy of the of the Wiener Filter approach, a comp
 
 Once the image histograms are determined, the histogram profiles are treated as high dimensional vectors where each histogram bin represents a dimension and the pixel frequency in each histogram bin represents the corresponding vector magnitude in that dimension. Using this formulation, the dot product between the two histogram profiles is taken to yield the angular difference between two histogram vectors. Thus, to calculate the image synthesis accuracy of the Wiener filter approach, this vector-histogram calculation is performed with the circular aperture system test image and the high-resolution synthesized image. The following figure demonstrates how the number of frames considered in the synthesis process effects the overall synthesis accuracy. Note that a smaller histogram angle indicates higher accuracy. Interestingly, the greatest synthesis accuracy is observed when eight frames are considered. It is hypothesized that this result is observed due to an aliasing effect a large number of frames are considered.
 
-<img src="readme_images/image_similarity.jpg" alt="image_similarity" align="center" width="900">
+<img src="readme_images/image_similarity.png" alt="image_similarity" align="center" width="900">
 
 
 
